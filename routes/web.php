@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Route;
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/', 'App\Http\Controllers\Page\SettingController@index')->name('setting');
     Route::get('/logout', 'App\Http\Controllers\Auth\LogoutController@perform')->name('logout.perform');
+    Route::post('/send_code', 'App\Http\Controllers\Page\SettingController@sendCode')->name('setting.send_code');
+    Route::post('/save', 'App\Http\Controllers\Page\SettingController@save')->name('setting.save');
 });
 
 Route::group(['middleware' => ['guest']], function() {

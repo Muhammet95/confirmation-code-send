@@ -8,6 +8,7 @@
     <div class="bg-light p-5 rounded">
         <h3>Настройки пользователя {{$user->name}}</h3>
         <form>
+            <input type="hidden" id="id" value="{{$user->id}}">
             <div class="form-group">
                 <label for="name">Пользователь</label>
                 <input type="text" class="form-control" id="name" aria-describedby="nameHelp" value="{{$user->name}}" required>

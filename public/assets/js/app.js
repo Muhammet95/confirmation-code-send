@@ -4,7 +4,7 @@ jQuery(document).ready(function($) {
      */
     $.ajaxSetup({
         headers: {
-            // 'X-CSRF-TOKEN': '{{csrf_token()}}'
+            'X-CSRF-TOKEN': `${$('input[name=csrf]').val()}`
         }
     });
 
@@ -12,8 +12,12 @@ jQuery(document).ready(function($) {
 
     $('.btn-send-code').on('click', sendCode);
 
+    $('#save_form').submit(saveInformation);
+
 
     function prepareInformation() {
+
+        $('input[name=id]').val($('#id').val());
         $('input[name=name]').val($('#name').val());
         $('input[name=password]').val($('#password').val());
 
@@ -57,8 +61,67 @@ jQuery(document).ready(function($) {
     }
 
     function sendCode(event) {
-        const name = $(event.currentTarget).data('name');
+        try {
+            const name = $(event.currentTarget).data('name');
+            const data = {};
 
+            data.send_type = name;
+            data.send_endpoint = $(`input[name=${name}]`).val();
+            if (!data.send_type)
+                notify('error', 'Ошибка выбора варианта отправки кода подтверждения');
 
+            console.log(data.send_type, data.send_endpoint);
+            $.ajax({
+                async: false,
+                url: `send_code`,
+                type: 'POST',
+                data: data,
+                success: function(response) {
+                    notify(response.status, response.message);
+                    console.log('success:',response);
+                },
+                error: function (response) {
+                    notify(response.status, response.message);
+                    console.log('error:',response);
+                }
+            });
+        } catch (e) {
+            console.log(e.message);
+        }
+    }
+
+    function notify(type, message) {
+        if (type === 'success') {
+            $('#notifier').removeClass('bg-danger');
+            $('#notifier').addClass('bg-success');
+        }
+        else {
+            $('#notifier').removeClass('bg-success');
+            $('#notifier').addClass('bg-danger');
+        }
+        $('#notifier').html(message);
+        $('#notifier').fadeIn();
+        setTimeout(() => { $('#notifier').fadeOut(); }, 3000);
+    }
+
+    function saveInformation(event) {
+        event.preventDefault();
+        const form = $(this).serialize();
+        $.ajax({
+            async: false,
+            url: `save`,
+            type: 'POST',
+            data: form,
+            success: function(response) {
+                console.log(response);
+                notify(response.status, response.message);
+                console.log('success:', response);
+            },
+            error: function (response) {
+                console.log(response);
+                notify(response.status, response.message);
+                console.log('error:', response);
+            }
+        });
     }
 });

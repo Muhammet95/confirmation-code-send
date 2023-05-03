@@ -38,6 +38,7 @@
 <main class="container">
     @yield('content')
     @include('layouts.partials.modal')
+    @include('layouts.partials.notify')
 </main>
 
 <script src="{!! url('assets/bootstrap/js/jquery-slim.min.js') !!}"></script>
