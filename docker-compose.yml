@@ -1,0 +1,56 @@
+version: "3.8"
+services:
+  app:
+    build:
+      args:
+        user: admin
+        uid: 1000
+      context: ./
+      dockerfile: Dockerfile
+    image: confirmation-code-send
+    container_name: confirmation-code-send-app
+    restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - ./:/var/www
+    networks:
+      - confirmation-code-send-network
+
+  db:
+    platform: linux/amd64
+    image: mysql
+    container_name: confirmation-code-send-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: db
+      MYSQL_ROOT_PASSWORD: test_password
+      MYSQL_PASSWORD: test_password
+      MYSQL_USER: test_user
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    ports:
+      - 33060:3306
+    volumes:
+      - db:/var/lib/mysql
+      - ./docker-compose/mysql/is.cnf:/etc/mysql/conf.d/my.cnf
+    networks:
+      - confirmation-code-send-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: confirmation-code-send-nginx
+    restart: unless-stopped
+    ports:
+      - 8100:80
+    volumes:
+      - ./:/var/www
+      - ./docker-compose/nginx:/etc/nginx/conf.d/
+    networks:
+      - confirmation-code-send-network
+
+networks:
+  confirmation-code-send-network:
+    driver: bridge
+
+volumes:
+  db:
